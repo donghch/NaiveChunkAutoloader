@@ -1,0 +1,6 @@
+name: NaiveChunkAutoLoader
+author: dieshenken
+version: 1.0.0-SNAPSHOT
+api-version: 1.14
+main: me.henrydhc.naivechunkautoloader.NaiveChunkAutoLoader
+load: POSTWORLD

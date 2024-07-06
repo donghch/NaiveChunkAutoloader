@@ -1,0 +1,9 @@
+
+# Chuck lifetime in seconds
+chunk-lifetime: 5
+
+# Chunk purge task period in seconds
+chunk-purge-period: 10
+
+# Enable detailed console message. This may spam the console
+detailed-msg: false
