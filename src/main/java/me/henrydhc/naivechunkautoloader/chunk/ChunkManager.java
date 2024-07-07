@@ -3,6 +3,8 @@ package me.henrydhc.naivechunkautoloader.chunk;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Logger;
 
 import org.bukkit.Chunk;
@@ -18,11 +20,13 @@ public class ChunkManager {
     private final Map<Chunk, Long> chunkMap;
     private final long chunkLife;
     private final Logger logger;
+    private final Lock lock;
 
     public ChunkManager(long chunkLife, JavaPlugin plugin) {
         chunkMap = new HashMap<>();
         this.chunkLife = chunkLife;
         this.logger = plugin.getLogger();
+        this.lock = new ReentrantLock();
     }
 
     /**
@@ -46,14 +50,17 @@ public class ChunkManager {
      */
     public boolean addChunk(Chunk chunk) {
 
+        lock.lock();
         if (chunk.isForceLoaded()) {
             // Emm, it's already force loaded. Just don't intervene
             // Also, that means it may already in our list.
+            lock.unlock();
             return false;
         }
         chunk.setForceLoaded(true);
         chunkMap.putIfAbsent(chunk, new Date().getTime() + chunkLife);
         logger.info("Loaded a chunk");
+        lock.unlock();
         return true;
     }
 
@@ -74,13 +81,21 @@ public class ChunkManager {
      * @param chunk target chunk
      */
     public void updateChunkExpiryTime(Chunk chunk) {
+        lock.lock();
         chunkMap.replace(chunk, new Date().getTime() + chunkLife);
+        lock.unlock();
     }
 
     /**
      * Remove expired chunks
+     * This function could be split into 2 individual funtions in 
+     * the future:
+     * - An async task to find all "purgable chunks"
+     *      - This only reads data
+     * - An sync task to remove those chunks
      */
     public void purgeExpiredChunk() {
+        lock.lock();
         Map<Chunk, Long> entryToRemove = new HashMap<>();
         long currentTime = new Date().getTime();
 
@@ -94,6 +109,7 @@ public class ChunkManager {
             removeChunk(chunk);
         }
         logger.info(String.format("Purged %d chunk(s)", entryToRemove.size()));
+        lock.unlock();
     }
 
     /**
