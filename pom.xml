@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.henrydhc.naivechunkautoloader</groupId>
-    <artifactId>NaiveChunkAutoloader</artifactId>
+    <artifactId>NaiveChunkAutoLoader</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>

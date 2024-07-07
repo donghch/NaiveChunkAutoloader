@@ -1,8 +1,10 @@
 package me.henrydhc.naivechunkautoloader;
 
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import me.henrydhc.naivechunkautoloader.chunk.ChunkManager;
+import me.henrydhc.naivechunkautoloader.config.ConfigLoader;
 import me.henrydhc.naivechunkautoloader.listeners.MovementListeners;
 import me.henrydhc.naivechunkautoloader.tasks.ChunkUnloadTask;
 
@@ -14,7 +16,10 @@ public class NaiveChunkAutoLoader extends JavaPlugin{
     @Override
     public void onEnable() {
 
-        manager = new ChunkManager(1000 * 30, this);
+        ConfigLoader.loadConfig(this);
+        FileConfiguration config = ConfigLoader.config;
+
+        manager = new ChunkManager(1000 * config.getInt("chunk-lifetime"), this);
 
         isFolia = isFolia();
         
@@ -22,7 +27,7 @@ public class NaiveChunkAutoLoader extends JavaPlugin{
         getServer().getPluginManager().registerEvents(new MovementListeners(manager), this);
 
         // Start tasks
-        new ChunkUnloadTask(manager).runTaskTimer(this, 0, 20 * 10);
+        new ChunkUnloadTask(manager).runTaskTimer(this, 0, 20 * config.getInt("chunk-purge-period"));
 
     }
 

@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import org.bukkit.Chunk;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import me.henrydhc.naivechunkautoloader.config.ConfigLoader;
 import me.henrydhc.naivechunkautoloader.utils.Util;
 
 /**
@@ -59,7 +60,9 @@ public class ChunkManager {
         }
         chunk.setForceLoaded(true);
         chunkMap.putIfAbsent(chunk, new Date().getTime() + chunkLife);
-        logger.info("Loaded a chunk");
+
+        if (ConfigLoader.config.getBoolean("detailed-msg"))
+            logger.info("Loaded a chunk");
         lock.unlock();
         return true;
     }
@@ -108,7 +111,8 @@ public class ChunkManager {
         for (Chunk chunk : entryToRemove.keySet()) {
             removeChunk(chunk);
         }
-        logger.info(String.format("Purged %d chunk(s)", entryToRemove.size()));
+        if (ConfigLoader.config.getBoolean("detailed-msg"))
+            logger.info(String.format("Purged %d chunk(s)", entryToRemove.size()));
         lock.unlock();
     }
 
